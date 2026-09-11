@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ryan Portfolio</title>
+
+    <!-- Inter & Space Grotesk Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        heading: ["Space Grotesk", "sans-serif"],
+                    },
+                    colors: {
+                        brand: {
+                            50: "#f5f3ff",
+                            100: "#ede9fe",
+                            500: "#6366f1",
+                            600: "#4f46e5",
+                            700: "#4338ca",
+                            900: "#1e1b4b",
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        /* Custom clean scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .gallery-item {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .gallery-media {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-auto-rows: 90px;
+            gap: 1.5rem;
+            grid-auto-flow: dense;
+        }
+
+        .gallery-grid.gallery-grid-natural {
+            grid-auto-rows: auto;
+            align-items: start;
+        }
+
+        .gallery-grid.gallery-grid-natural .gallery-item {
+            grid-column: span 1 !important;
+            grid-row: auto !important;
+        }
+
+        .gallery-grid.gallery-grid-apps {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-auto-flow: row;
+        }
+
+        .gallery-grid.gallery-grid-web {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-auto-flow: row;
+        }
+
+        .gallery-grid.gallery-grid-apps .gallery-item,
+        .gallery-grid.gallery-grid-web .gallery-item {
+            grid-column: span 1 !important;
+            grid-row: auto !important;
+        }
+
+        .gallery-grid.gallery-grid-apps figcaption,
+        .gallery-grid.gallery-grid-web figcaption {
+            min-width: 0;
+        }
+
+        .gallery-grid.gallery-grid-apps figcaption>div,
+        .gallery-grid.gallery-grid-web figcaption>div {
+            flex-direction: column;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            row-gap: 0.25rem;
+        }
+
+        .gallery-grid.gallery-grid-apps figcaption a,
+        .gallery-grid.gallery-grid-web figcaption a {
+            white-space: nowrap;
+        }
+
+        .gallery-masonry {
+            column-count: 1;
+            column-gap: 1.5rem;
+        }
+
+        .gallery-masonry .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+
+        .gallery-masonry figcaption>div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+
+        .gallery-masonry figcaption a {
+            white-space: nowrap;
+        }
+
+        .gallery-grid.gallery-grid-natural .gallery-media {
+            flex: none;
+            min-height: 0 !important;
+            height: auto !important;
+            aspect-ratio: auto;
+        }
+
+        .gallery-grid.gallery-grid-natural .gallery-media img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        @media (max-width: 767px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-auto-rows: 110px;
+            }
+
+            .gallery-grid.gallery-grid-apps,
+            .gallery-grid.gallery-grid-web {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-masonry {
+                column-count: 1;
+            }
+        }
+
+        @media (min-width: 640px) {
+            .gallery-masonry {
+                column-count: 2;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .gallery-masonry {
+                column-count: 3;
+            }
+        }
+
+        .image-modal {
+            background: rgb(15 23 42 / 0.88);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="#home"
+                class="font-heading font-bold text-lg text-slate-900 tracking-tight hover:text-indigo-600 transition-colors">
+                ry<span class="text-indigo-600">.blank</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#about" class="hover:text-indigo-600 transition-colors">About</a>
+                <a href="#projects" class="hover:text-indigo-600 transition-colors">Projects</a>
+                <a href="#skills" class="hover:text-indigo-600 transition-colors">Skills</a>
+                <!-- <a href="#contact" class="hover:text-indigo-600 transition-colors">Contact</a> -->
+            </nav>
+
+            <!-- CTA Button -->
+            <!-- <a href="#contact"
+                class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-indigo-600 transition-all shadow-sm">
+                Get in Touch
+            </a> -->
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 space-y-24 py-12 md:py-20">
+        <!-- Hero Section -->
+        <section id="home" class="pt-6 md:pt-12 space-y-6">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Semester 1 Informatics Student at UBM Ancol 🇮🇩</span>
+            </div>
+
+            <div class="space-y-4 max-w-3xl">
+                <h1 class="text-4xl sm:text-6xl font-heading font-bold text-slate-900 tracking-tight leading-[1.15]">
+                    Hi, I'm <span class="text-indigo-600">Ryan</span>. <br />
+                    I like to explore. Experiment. Create.
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
+                    I'm a first-semester Informatics student who enjoys exploring web development, software, games, and
+                    digital tools through experiments and personal projects.
+                </p>
+            </div>
+
+            <!-- Action Links -->
+            <div class="flex flex-wrap items-center gap-4 pt-4">
+                <a href="#projects"
+                    class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all shadow-sm flex items-center gap-2">
+                    <span>View My Projects</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </a>
+                <!-- <a href="#contact"
+                    class="px-6 py-3 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-sm font-semibold rounded-xl transition-all">
+                    Contact Me
+                </a> -->
+            </div>
+
+            <!-- Social Links Bar -->
+            <div class="pt-6 flex items-center gap-6 text-sm font-medium text-slate-500 border-t border-slate-200">
+                <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Connect:</span>
+                <a href="https://github.com/ryn-01" target="_blank" rel="noopener"
+                    class="hover:text-slate-900 transition-colors">GitHub ↗</a>
+                <a href="https://www.instagram.com/ry.blank/" target="_blank" rel="noopener"
+                    class="hover:text-slate-900 transition-colors">Instagram ↗</a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="pt-8 border-t border-slate-200 space-y-6">
+            <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-heading font-bold text-slate-900">
+                    About Me
+                </h2>
+                <p class="text-slate-500 text-sm">
+                    Background, education, and interest.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div class="md:col-span-2 space-y-4 text-slate-600 text-base leading-relaxed">
+                    <p>
+                        I started in web development, but my curiosity quickly pulled me into broader tech—from building
+                        Laravel apps and browser automation tools to experimenting with game dev, and 3D modeling.
+                    </p>
+                    <p>
+                        For me, building isn't always about the final destination. It’s about figuring out how things
+                        work, testing ideas, and learning through hands-on experimentation. Currently, I'm pursuing an
+                        Informatics degree at Universitas Bunda Mulia while continuing to explore and build projects
+                        outside the classroom.
+                    </p>
+                </div>
+
+                <!-- Student Quick Info Box -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
+                    <h3
+                        class="font-heading font-semibold text-slate-900 text-sm uppercase tracking-wider text-indigo-600">
+                        Quick Facts
+                    </h3>
+                    <ul class="space-y-3 text-xs text-slate-600">
+                        <li class="flex justify-between border-b border-slate-100 pb-2">
+                            <span class="text-slate-400">Education</span>
+                            <span class="font-medium text-slate-800 text-right">UBM Ancol</span>
+                        </li>
+                        <li class="flex justify-between border-b border-slate-100 pb-2">
+                            <span class="text-slate-400">Major</span>
+                            <span class="font-medium text-slate-800">Informatics / CS</span>
+                        </li>
+                        <li class="flex justify-between border-b border-slate-100 pb-2">
+                            <span class="text-slate-400">Status</span>
+                            <span class="font-medium text-slate-800">Undergraduate (S1)</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="text-slate-400">Location</span>
+                            <span class="font-medium text-slate-800">Indonesia 🇮🇩</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="pt-8 border-t border-slate-200 space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-heading font-bold text-slate-900">
+                        Featured Projects
+                    </h2>
+                    <p class="text-slate-500 text-sm">
+                        One featured piece from each area I enjoy exploring.
+                    </p>
+                </div>
+                <!-- <a href="https://github.com" target="_blank" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+          <span>See all on GitHub</span>
+          <span>→</span>
+        </a> -->
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Project 1 -->
+                <div
+                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="p-6 space-y-4">
+                        <div class="aspect-video bg-orange-50 rounded-xl border border-slate-200/80 overflow-hidden">
+                            <img src="assets/blenders/Ship.webp" alt="Featured Blender render: Ship"
+                                data-lightbox="true" class="w-full h-full object-cover" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-heading font-bold text-slate-900 text-xl">
+                                    Red Tide Recon
+                                </h3>
+                                <span class="text-xs text-slate-400 font-mono">2026</span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                A stylized 3D study exploring dramatic lighting and painterly liquid shaders. The piece
+                                captures a biplane navigating dark, crimson-veined waters alongside an isolated warship,
+                                leaning heavy into mood and worldbuilding.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-orange-100 text-orange-700 font-medium">Blender</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">3D Render</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div
+                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="p-6 space-y-4">
+                        <div class="aspect-video bg-violet-50 rounded-xl border border-slate-200/80 overflow-hidden">
+                            <img src="assets/apps/IDrive.webp" alt="Featured mobile app design: IDrive"
+                                data-lightbox="true" class="w-full h-full object-cover" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-heading font-bold text-slate-900 text-xl">
+                                    Multi-Service Delivery App Concept
+                                </h3>
+                                <span class="text-xs text-slate-400 font-mono">2024</span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Mobile interface design focusing on modular navigation, clear visual hierarchy, and
+                                multi-service user flows—from ride-hailing and food delivery to e-commerce storefronts.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-violet-100 text-violet-700 font-medium">Figma</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">UI/UX</span>
+                        </div>
+                        <div class="flex items-center gap-3 font-semibold">
+
+                            <div class="flex items-center gap-3 font-semibold">
+                                <a href="https://www.figma.com/design/jRKGyXYkWL0SivN44PHGof/iDrive?node-id=0-1&t=dTbBfXmb1frgRH0K-1" class="text-indigo-600 hover:text-indigo-800">View ↗</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div
+                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="p-6 space-y-4">
+                        <div class="aspect-video bg-indigo-50 rounded-xl border border-slate-200/80 overflow-hidden">
+                            <img src="assets/webgame/Crud.webp" alt="Featured web prototype: CRUD application"
+                                data-lightbox="true" class="w-full h-full object-cover" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-heading font-bold text-slate-900 text-xl">
+                                    Simple Data Management Web App
+                                </h3>
+                                <span class="text-xs text-slate-400 font-mono">2024</span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Lightweight administrative dashboard managing item inventory, real-time table updates, and transactional data entries.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 pb-6 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 font-medium">Web</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Prototype</span>
+                        </div>
+                        <div class="flex items-center gap-3 font-semibold">
+                            <a href="https://www.youtube.com/watch?v=NN5Y3OEv7BM" class="text-indigo-600 hover:text-indigo-800">Video ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div
+                    class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div class="p-6 space-y-4">
+                        <div class="aspect-video bg-emerald-50 rounded-xl border border-slate-200/80 overflow-hidden">
+                            <img src="assets/webgame/Roblox.webp" alt="Featured game prototype: Roblox project"
+                                data-lightbox="true" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-heading font-bold text-slate-900 text-xl">Top-Down Shooter Mechanics</h3>
+                                <span class="text-xs text-slate-400 font-mono">2024</span>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                A top-down shooter prototype built in Luau on Roblox. Focuses on custom raycasting aiming systems, character line-of-sight physics, dynamic projectile trails, and combat camera controls.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6 pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium">Roblox</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Prototype</span>
+                        </div>
+                        <div class="flex items-center gap-3 font-semibold">
+                            <a href="https://youtu.be/yDxni_rTFWc" class="text-indigo-600 hover:text-indigo-800">Video ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Remaining work grouped by discipline -->
+            <div class="pt-4 space-y-10">
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">More Blender Renders</h2>
+                        <p class="text-slate-500 text-sm">More studies in modeling, materials, and lighting.</p>
+                    </div>
+                    <div class="gallery-grid" data-gallery>
+                                                <figure class="gallery-item col-span-2 md:col-span-2 md:row-span-4 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-amber-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/blenders/Waltuh.webp" alt="Blender render study: Waltuh"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Walter White</h3>
+                                <span class="text-xs text-slate-500">2026</span>
+                            </figcaption>
+                        </figure>
+                                                <figure class="gallery-item col-span-2 md:col-span-2 md:row-span-3 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-yellow-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/blenders/Tram.webp" alt="Blender render study: Tram" data-gallery-image
+                                    data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Tram</h3>
+                                <span class="text-xs text-slate-500">2024</span>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item col-span-2 md:col-span-2 md:row-span-3 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-orange-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/blenders/Robot.webp" alt="Blender render study: Robot"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Robot</h3><span
+                                    class="text-xs text-slate-500">2023</span>
+                            </figcaption>
+                        </figure>
+
+
+                        <figure class="gallery-item col-span-2 md:col-span-3 md:row-span-4 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-lime-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/blenders/Steve.webp" alt="Blender render study: Steve"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Steve</h3><span
+                                    class="text-xs text-slate-500">2023</span>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">More Mobile App Designs
+                        </h2>
+                        <p class="text-slate-500 text-sm">More interface concepts and interaction explorations.</p>
+                    </div>
+                    <div class="gallery-masonry">
+                        <figure class="gallery-item group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-violet-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/apps/Tojek.webp" alt="Mobile app design: Tojek" data-gallery-image
+                                    data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Tojek</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                               <a href="https://www.figma.com/design/PrHCUgYM5MLDrifA08a1Oa/toJek?node-id=0-1&t=Pz9MhEndVI2l2xDL-1"
+                                        class="text-indigo-600 hover:text-indigo-800 font-semibold">View ↗</a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-indigo-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/apps/Login.webp" alt="Mobile app design: Login" data-gallery-image
+                                    data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Login Concept</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                    <a href="https://www.figma.com/design/0VsSRDjDFKqdf6VnXQSrF1/Tugas_design?node-id=0-1&t=TGh7zydHUcXB6TIe-1"
+                                        class="text-indigo-600 hover:text-indigo-800 font-semibold">View ↗</a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-blue-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/apps/IndoFood.webp" alt="Mobile app design: IndoFood"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">IndoFood</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                <a href="https://www.figma.com/design/MKa3RUzfcWN2RvxP5pCoLd/Ryan_XI_TIP_2?node-id=0-1&t=CKxyFoAGisuXU28B-1"
+                                        class="text-indigo-600 hover:text-indigo-800 font-semibold">Figma ↗</a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-sky-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/apps/Batikra.webp" alt="Mobile app design: Batikra" data-gallery-image
+                                    data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Batikra</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                    <a href="https://www.figma.com/design/P7ovxK82enPMC1KIvZRXi9/Untitled?node-id=0-1&t=Txja9M07mZGnsRY1-1"
+                                        class="text-indigo-600 hover:text-indigo-800 font-semibold">View ↗</a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-heading font-bold text-slate-900">More Web & Game Prototypes
+                        </h2>
+                        <p class="text-slate-500 text-sm">Small experiments shared through GitHub and short videos.</p>
+                    </div>
+                    <div class="gallery-grid gallery-grid-natural gallery-grid-web" data-gallery
+                        data-gallery-mode="natural">
+                        <figure class="gallery-item col-span-2 md:col-span-4 md:row-span-3 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-indigo-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/webgame/Dashboard.webp" alt="Web prototype: Dashboard"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Bike Sharing Analytics Dashboard</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                    <span>Web · Experimental</span><span class="flex gap-3">
+                                </div>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item col-span-2 md:col-span-2 md:row-span-4 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-emerald-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/webgame/Unity.webp" alt="Game prototype: Unity project"
+                                    data-gallery-image data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">Mini Game Prototype</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                    <span>Game · 2D Experimental</span>
+                                </div>
+                            </figcaption>
+                        </figure>
+                        <figure class="gallery-item col-span-2 md:col-span-3 md:row-span-3 group">
+                            <div
+                                class="gallery-media min-h-[180px] rounded-2xl bg-amber-50 border border-slate-200 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                                <img src="assets/webgame/Character.webp" alt="2D character rig" data-gallery-image
+                                    data-lightbox="true" class="w-full h-full object-cover" />
+                            </div>
+                            <figcaption class="pt-3">
+                                <h3 class="font-heading font-semibold text-sm text-slate-900">2D Character Rig</h3>
+                                <div class="flex items-center justify-between gap-3 text-xs text-slate-500">
+                                    <span>Game · 2D Experimental</span><span class="flex gap-3"><a
+                                            href="https://www.youtube.com/watch?v=1X2MHgsNm8c" class="text-indigo-600 hover:text-indigo-800 font-semibold">Video
+                                            ↗</a></span>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="pt-8 border-t border-slate-200 space-y-6">
+            <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-heading font-bold text-slate-900">
+                    Skills & Knowledge
+                </h2>
+                <p class="text-slate-500 text-sm">
+                    Technologies, tools, and frameworks I work with.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Frontend -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-heading font-semibold text-sm text-indigo-600 uppercase tracking-wider">
+                        Frontend
+                    </h3>
+                    <ul class="space-y-1.5 text-xs text-slate-700">
+                        <li>HTML / CSS</li>
+                        <li>JavaScript</li>
+                        <li>Python</li>
+                        <li>React.js</li>
+                        <li>Tailwind CSS</li>
+                    </ul>
+                </div>
+
+                <!-- Backend -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-heading font-semibold text-sm text-indigo-600 uppercase tracking-wider">
+                        Backend
+                    </h3>
+                    <ul class="space-y-1.5 text-xs text-slate-700">
+                        <li>Node.js</li>
+                        <li>Php</li>
+                        <li>Laravel</li>
+                        <li>MySQL</li>
+                    </ul>
+                </div>
+
+                <!-- Tools & Environment -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-3">
+                    <h3 class="font-heading font-semibold text-sm text-indigo-600 uppercase tracking-wider">
+                        Tools
+                    </h3>
+                    <ul class="space-y-1.5 text-xs text-slate-700">
+                        <li>Git / GitHub</li>
+                        <li>VsCode</li>
+                        <li>Figma</li>
+                        <li>Blender</li>
+                        <li>XAMPP</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <!-- <section id="contact" class="pt-8 border-t border-slate-200">
+            <div class="bg-indigo-600 rounded-3xl p-8 sm:p-12 text-white space-y-8 shadow-sm">
+                <div class="space-y-4 max-w-xl">
+                    <h2 class="text-3xl sm:text-4xl font-heading font-bold">
+                        Let's connect!
+                    </h2>
+                    <p class="text-indigo-100 text-sm leading-relaxed">
+                        I'm currently looking for internship opportunities, project
+                        collaborations, or just connecting with other developers. Feel
+                        free to drop me an email!
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs font-semibold">
+                    <button id="copy-email-btn"
+                        class="px-5 py-3 bg-white text-slate-900 rounded-xl hover:bg-indigo-50 transition-colors flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <span id="email-btn-text">Copy Email Address</span>
+                    </button>
+
+                    <a href="mailto:your.email@university.ac.id"
+                        class="px-5 py-3 border border-indigo-300 text-white rounded-xl hover:bg-indigo-700 transition-colors">
+                        Send Direct Mail ↗
+                    </a>
+                </div>
+
+                <div
+                    class="pt-6 border-t border-indigo-500/60 flex flex-wrap items-center justify-between gap-4 text-xs text-indigo-200">
+                    <span>Email:
+                        <strong class="text-white">your.email@university.ac.id</strong></span>
+                    <div class="flex items-center gap-4 text-white font-medium">
+                        <a href="https://github.com" target="_blank" class="hover:underline">GitHub</a>
+                        <a href="https://linkedin.com" target="_blank" class="hover:underline">LinkedIn</a>
+                        <a href="https://instagram.com" target="_blank" class="hover:underline">Instagram</a>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="py-8 border-t border-slate-200 text-center text-xs text-slate-500">
+        <p>
+            © <span id="current-year"></span> Built simply with HTML,
+            Tailwind CSS, & JavaScript.
+        </p>
+    </footer>
+
+    <!-- Image preview modal -->
+    <div id="image-modal" class="image-modal fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog"
+        aria-modal="true" aria-label="Image preview">
+        <button id="image-modal-close" type="button"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white text-2xl hover:bg-white/20"
+            aria-label="Close image preview">&times;</button>
+        <img id="image-modal-content" src="" alt=""
+            class="max-h-[90vh] max-w-[95vw] object-contain rounded-lg shadow-2xl" />
+    </div>
+
+    <!-- Simple Scripts -->
+    <script>
+        // Update year automatically
+        document.getElementById("current-year").textContent =
+            new Date().getFullYear();
+
+        // Simple Copy Email Functionality
+        const emailAddress = "your.email@university.ac.id";
+        const copyBtn = document.getElementById("copy-email-btn");
+        const btnText = document.getElementById("email-btn-text");
+
+        copyBtn.addEventListener("click", () => {
+            const el = document.createElement("textarea");
+            el.value = emailAddress;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand("copy");
+            document.body.removeChild(el);
+
+            btnText.textContent = "Email Copied to Clipboard!";
+            setTimeout(() => {
+                btnText.textContent = "Copy Email Address";
+            }, 2500);
+        });
+
+        // Make gallery spans follow each image's natural aspect ratio.
+        const galleryGrids = document.querySelectorAll("[data-gallery]");
+        const layoutGallery = (grid) => {
+            const isMobile = window.matchMedia("(max-width: 767px)").matches;
+            grid.querySelectorAll(":scope > figure").forEach((item) => {
+                const image = item.querySelector("[data-gallery-image]");
+                if (!image || !image.naturalWidth) return;
+
+                if (grid.dataset.galleryMode === "natural") {
+                    item.style.gridColumn = isMobile ? "span 2" : "span 1";
+                    item.style.gridRow = "auto";
+                    return;
+                }
+
+                if (isMobile) {
+                    item.style.gridColumn = "span 2";
+                    item.style.gridRow = "span 3";
+                    return;
+                }
+
+                const ratio = image.naturalWidth / image.naturalHeight;
+                const columns = ratio >= 1.55 ? 3 : ratio >= 1.05 ? 2 : 2;
+                const rows = ratio < 0.8 ? 4 : ratio < 1.15 ? 3 : 2;
+                item.style.gridColumn = `span ${columns}`;
+                item.style.gridRow = `span ${rows}`;
+            });
+        };
+
+        galleryGrids.forEach((grid) => {
+            grid.querySelectorAll("[data-gallery-image]").forEach((image) => {
+                image.addEventListener("load", () => layoutGallery(grid));
+            });
+            layoutGallery(grid);
+        });
+        window.addEventListener("resize", () => galleryGrids.forEach(layoutGallery));
+
+        // Open portfolio images in a full-size modal.
+        const imageModal = document.getElementById("image-modal");
+        const imageModalContent = document.getElementById("image-modal-content");
+        const closeImageModal = () => {
+            imageModal.classList.add("hidden");
+            imageModal.classList.remove("flex");
+            imageModalContent.src = "";
+        };
+
+        document.querySelectorAll("[data-lightbox='true']").forEach((image) => {
+            image.classList.add("cursor-zoom-in");
+            image.addEventListener("click", () => {
+                imageModalContent.src = image.currentSrc || image.src;
+                imageModalContent.alt = image.alt;
+                imageModal.classList.remove("hidden");
+                imageModal.classList.add("flex");
+            });
+        });
+        document.getElementById("image-modal-close").addEventListener("click", closeImageModal);
+        imageModal.addEventListener("click", (event) => {
+            if (event.target === imageModal) closeImageModal();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeImageModal();
+        });
+    </script>
+</body>
+
+</html>
